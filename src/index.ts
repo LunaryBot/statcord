@@ -1,3 +1,3 @@
-export default function print() {
-    console.log('Hello World');
-}
+import Client from './structures/Client';
+
+export { Client };
