@@ -1,6 +1,23 @@
 import type { AxiosInstance } from "axios";
 import type { EventEmitter } from "stream";
 
+export interface BotStatsData {
+    time: number;
+    servers: string;
+    users: string;
+    active: Array<string>,
+    commands: string;
+    popular: Array<{ name: string, count: string }>;
+    memactive: string;
+    memload: string;
+    cpuload: string;
+    bandwidth: string;
+    custom1: string;
+    custom2: string;
+    count: number;
+    votes: number;
+}
+
 export interface ClientOptions {
     baseUrl?: string;
     botId?: string;
@@ -23,6 +40,7 @@ export interface StatsPayloadRequestData {
     custom1: string;
     custom2: string;
 }
+
 
 export class Client extends EventEmitter {
 

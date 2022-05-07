@@ -3,7 +3,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import systeminformation from 'systeminformation';
 import os from 'os';
 
-import { ClientOptions, StatsPayloadRequestData } from '../../typings';
+import { BotStatsData, ClientOptions, StatsPayloadRequestData } from '../../typings';
 
 import { ApiVersions } from '../utils/Constants';
 
@@ -62,6 +62,57 @@ class Client extends EventEmitter {
     }
 
     /**
+     * Add command to the popular commands.
+     * @param {string} commandName The command name to add to the popular commands. 
+     * @param {string} userId The user id to add to the actived users.
+     * @returns {{name: string, count: number}}
+     */
+    addCommand(commandName: string, userId: string) {
+        if (typeof commandName !== 'string') {
+            throw new Error('The commandName must be a string.');
+        }
+
+        if (typeof userId !== 'string') {
+            throw new Error('The userId must be a string.');
+        }
+
+        if (!this.activedUsers.includes(userId)) {
+            this.activedUsers.push(userId);
+        }
+
+        this.commandsRunneds++;
+
+        let command: { name: string, count: number } | undefined = this.popularCommands.find(c => c.name === commandName);
+
+        if (!command) {
+            command = { name: commandName, count: 1 };
+            this.popularCommands.push(command);
+        } else {
+            command.count++;
+        }
+
+        return command;
+    }
+
+    /**
+     * Get bot stats.
+     * @param {string} botId The bot id to send the stats to.
+     */
+    public async getStats(botId: string = this.options.botId as string) {
+        if (typeof botId !== 'string') {
+            throw new Error('The botId must be a string.');
+        }
+
+        const response = await this.api.get(`/${botId}`).catch(e => e.response);
+
+        if (response.status === 200) {
+            return response.data.data as Array<BotStatsData>;
+        }
+
+        throw new Error(response.statusText);
+    }
+
+    /**
      * Post the stats to the api.
      * @param {StatsPayloadRequestData} data The data to send to the API.
      * @returns {Promise<void>}
@@ -73,7 +124,7 @@ class Client extends EventEmitter {
         memoryUsed?: number,
         cpuload?: number,
         bandwidth?: number,
-    }) {
+    }): Promise<void|never> {
         if (typeof data.guildsCount !== 'number' || typeof data.usersCount !== 'number') {
             throw new Error('The guildsCount and usersCount must be numbers.');
         };
@@ -153,14 +204,8 @@ class Client extends EventEmitter {
 
         const response = await this.api.post('/stats', JSON.stringify({ ...payload, key: this.key })).catch(e => e.response as AxiosResponse);
 
-        if (response.status >= 500) {
-            this.emit('error', new Error(JSON.stringify(response.data)));
-            return;
-        }
-
-        if (response.status === 400 || response.status === 429) {
-            this.emit('error', new Error(JSON.stringify(response.data)));
-            return;
+        if (response.status >= 500 || response.status === 400 || response.status === 429) {
+            throw new Error(JSON.stringify(response.data));
         }
 
         if (response.status === 200) {
@@ -175,39 +220,6 @@ class Client extends EventEmitter {
             
             return;
         }
-    }
-
-    /**
-     * Add command to the popular commands.
-     * @param {string} commandName The command name to add to the popular commands. 
-     * @param {string} userId The user id to add to the actived users.
-     * @returns {{name: string, count: number}}
-     */
-    addCommand(commandName: string, userId: string) {
-        if (typeof commandName !== 'string') {
-            throw new Error('The commandName must be a string.');
-        }
-
-        if (typeof userId !== 'string') {
-            throw new Error('The userId must be a string.');
-        }
-
-        if (!this.activedUsers.includes(userId)) {
-            this.activedUsers.push(userId);
-        }
-
-        this.commandsRunneds++;
-
-        let command: { name: string, count: number } | undefined = this.popularCommands.find(c => c.name === commandName);
-
-        if (!command) {
-            command = { name: commandName, count: 1 };
-            this.popularCommands.push(command);
-        } else {
-            command.count++;
-        }
-
-        return command;
     }
 }
 
