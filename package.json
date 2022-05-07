@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Simple statcord wrapper",
   "main": "dist/index.js",
-  "types": "typings/",
+  "types": "typings/index.d.ts",
   "repository": "https://github.com/LunaryBot/statcord.git",
   "author": "JVOPINHO",
   "license": "GPL-3.0",

@@ -62,7 +62,9 @@ class Client extends EventEmitter {
     }
 
     /**
+     * Post the stats to the api.
      * @param {StatsPayloadRequestData} data The data to send to the API.
+     * @returns {Promise<void>}
     */
     public async post(data: {
         guildsCount: number,
@@ -158,6 +160,7 @@ class Client extends EventEmitter {
 
         if (response.status === 400 || response.status === 429) {
             this.emit('error', new Error(JSON.stringify(response.data)));
+            return;
         }
 
         if (response.status === 200) {
@@ -172,6 +175,39 @@ class Client extends EventEmitter {
             
             return;
         }
+    }
+
+    /**
+     * Add command to the popular commands.
+     * @param {string} commandName The command name to add to the popular commands. 
+     * @param {string} userId The user id to add to the actived users.
+     * @returns {{name: string, count: number}}
+     */
+    addCommand(commandName: string, userId: string) {
+        if (typeof commandName !== 'string') {
+            throw new Error('The commandName must be a string.');
+        }
+
+        if (typeof userId !== 'string') {
+            throw new Error('The userId must be a string.');
+        }
+
+        if (!this.activedUsers.includes(userId)) {
+            this.activedUsers.push(userId);
+        }
+
+        this.commandsRunneds++;
+
+        let command: { name: string, count: number } | undefined = this.popularCommands.find(c => c.name === commandName);
+
+        if (!command) {
+            command = { name: commandName, count: 1 };
+            this.popularCommands.push(command);
+        } else {
+            command.count++;
+        }
+
+        return command;
     }
 }
 
