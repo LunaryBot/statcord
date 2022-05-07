@@ -8,13 +8,14 @@
   "author": "JVOPINHO",
   "license": "GPL-3.0",
   "scripts": {
-    "dev": "ts-node-dev --respawn --ignore-watch node_modules --no-notify src/index.ts",
+    "dev": "ts-node-dev --respawn --ignore-watch node_modules --no-notify test/index.ts",
     "build": "tsc"
   },
   "devDependencies": {
     "@types/node": "^17.0.31",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
+    "dotenv": "^16.0.0",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -26,6 +27,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "axios": "^0.27.2"
+    "axios": "^0.27.2",
+    "systeminformation": "^5.11.14"
   }
 }
