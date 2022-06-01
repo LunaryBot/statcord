@@ -42,6 +42,7 @@ export interface StatsPayloadRequestData {
 
 
 export class Client extends EventEmitter {
+    constructor(key: string, botId: string, options?: ClientOptions);
     public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
     public once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
     public emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean;
