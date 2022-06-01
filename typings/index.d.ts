@@ -1,5 +1,5 @@
 import type { AxiosInstance } from "axios";
-import type { EventEmitter } from "stream";
+import type { EventEmitter } from "events";
 
 export interface BotStatsData {
     time: number;
@@ -20,7 +20,6 @@ export interface BotStatsData {
 
 export interface ClientOptions {
     baseUrl?: string;
-    botId?: string;
     postCpuStatistics?: boolean;
     postMemoryStatistics?: boolean;
     postNetworkStatistics?: boolean;
@@ -43,6 +42,9 @@ export interface StatsPayloadRequestData {
 
 
 export class Client extends EventEmitter {
+    public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
+    public once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
+    public emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean;
 
     public get key(): string;
     public options: ClientOptions;
@@ -57,4 +59,8 @@ export class Client extends EventEmitter {
     
     public post(data: { guildsCount: number, usersCount: number, memoryActive?: number, memoryUsed?: number, cpuload?: number, bandwidth?: number }): Promise<void>;
     public addCommand(commandName: string, userId: string): { name: string, count: number };
+}
+
+interface ClientEvents {
+    postStats: [StatsPayloadRequestData];
 }

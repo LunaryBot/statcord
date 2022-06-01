@@ -23,6 +23,7 @@ class Client extends EventEmitter {
      */
     
     public declare key: string;
+    public botId: string;
     public options: ClientOptions;
     public api: AxiosInstance;
 
@@ -33,7 +34,7 @@ class Client extends EventEmitter {
     public popularCommands: Array<{ name: string, count: number }>;
     public customFields: Map<1 | 2, string | number>
 
-    constructor(key: string, options?: ClientOptions) {
+    constructor(key: string, botId: string, options?: ClientOptions) {
         super();
         
         Object.defineProperty(this, 'key', {
@@ -42,6 +43,8 @@ class Client extends EventEmitter {
             enumerable: false,
             configurable: false
         });
+
+        this.botId = botId;
 
         this.options = options || {};
 
@@ -98,7 +101,7 @@ class Client extends EventEmitter {
      * Get bot stats.
      * @param {string} botId The bot id to send the stats to.
      */
-    public async getStats(botId: string = this.options.botId as string) {
+    public async getStats(botId: string = this.botId as string) {
         if (typeof botId !== 'string') {
             throw new Error('The botId must be a string.');
         }
@@ -188,7 +191,7 @@ class Client extends EventEmitter {
         const popular = this.popularCommands.sort((a, b) => a.count - b.count).reverse().splice(0, 5);
 
         const payload: StatsPayloadRequestData = {
-            id: this.options.botId,
+            id: this.botId,
             servers: data.guildsCount.toString(),
             users: data.usersCount.toString(),
             active: this.activedUsers,
